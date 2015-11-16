@@ -32,10 +32,7 @@ func formValues(params map[string]string) url.Values {
 }
 
 func buildGetUrl(params map[string]string, endpoint string) string {
-	query := make(url.Values)
-	for key, value := range params {
-		query.Set(key, value)
-	}
+	query := formValues(params)
 	result := endpoint
 	if (len(params)) > 0 {
 		result = endpoint + "?" + query.Encode()
