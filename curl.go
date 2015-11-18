@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -94,12 +95,11 @@ func (p RequestParms) populateHeaders(req *http.Request) {
 }
 
 //provides a httpResponse for a GET,DELETE,POST or PUT. Can support json data, use "json" as a key on the parmeter
-func Curl(p RequestParms) (*http.Response, error) {
+func Curl(p RequestParms, headers ...map[string]string) (*http.Response, error) {
 	var client http.Client
 	var req *http.Request
 	var resp *http.Response
 	var err error
-
 	if p.Method == HTTP_GET || p.Method == HTTP_DELETE {
 		url := buildGetUrl(p.Params, p.Endpoint)
 		req, _ = http.NewRequest(p.Method, url, nil)
@@ -113,9 +113,15 @@ func Curl(p RequestParms) (*http.Response, error) {
 		if err != nil {
 			log.Println(err)
 		}
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-		p.populateHeaders(req)
+		if len(headers[0]) > 0 {
+			for k, v := range headers[0] {
+				req.Header.Add(k, v)
+			}
+		} else {
+			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+			p.populateHeaders(req)
+		}
 		resp, err = client.Do(req)
 	}
 	if p.Method == HTTP_JSONPOST {
