@@ -100,8 +100,6 @@ func Curl(p RequestParms, headers ...map[string]string) (*http.Response, error) 
 	var req *http.Request
 	var resp *http.Response
 	var err error
-	log.Println(fmt.Sprintf("==== vtputils: p.Method : %s", p.Method))
-	log.Println(fmt.Sprintf("==== vtputils: headers len: %d", len(headers[0])))
 	if p.Method == HTTP_GET || p.Method == HTTP_DELETE {
 		url := buildGetUrl(p.Params, p.Endpoint)
 		req, _ = http.NewRequest(p.Method, url, nil)
@@ -109,7 +107,6 @@ func Curl(p RequestParms, headers ...map[string]string) (*http.Response, error) 
 		resp, err = client.Do(req)
 	}
 	if p.Method == HTTP_POST {
-		log.Println("== vtputils: IN POST")
 		url := p.Endpoint
 		data := formValues(p.Params)
 		req, err = http.NewRequest(p.Method, url, bytes.NewBufferString(data.Encode()))
