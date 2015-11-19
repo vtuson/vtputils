@@ -113,9 +113,14 @@ func Curl(p RequestParms) (*http.Response, error) {
 		if err != nil {
 			log.Println(err)
 		}
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
 		req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-		p.populateHeaders(req)
+		if p.Headers == nil {
+			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		} else {
+			p.populateHeaders(req)
+		}
+
 		resp, err = client.Do(req)
 	}
 	if p.Method == HTTP_JSONPOST {
