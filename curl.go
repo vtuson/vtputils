@@ -106,7 +106,7 @@ func Curl(p RequestParms) (*http.Response, error) {
 		p.populateHeaders(req)
 		resp, err = client.Do(req)
 	}
-	if p.Method == HTTP_POST {
+	if p.Method == HTTP_POST || p.Method == HTTP_PUT {
 		url := p.Endpoint
 		data := formValues(p.Params)
 		req, err = http.NewRequest(p.Method, url, bytes.NewBufferString(data.Encode()))

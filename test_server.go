@@ -47,16 +47,20 @@ func (s *TestServer) Done() {
 func (s *TestServer) StartTestServer() {
 	myMux := http.NewServeMux()
 	myMux.HandleFunc("/", serve404)
-	if s.CustomHander == nil {
-		myMux.HandleFunc(s.EndPoint, s.handleEndpoint)
-	} else {
-		myMux.HandleFunc(s.EndPoint, s.CustomHander)
+	if s.EndPoint != "" {
+		if s.CustomHander == nil {
+			myMux.HandleFunc(s.EndPoint, s.handleEndpoint)
+		} else {
+			myMux.HandleFunc(s.EndPoint, s.CustomHander)
+		}
 	}
 	s.stop = make(chan int)
 
 	ln, err := net.Listen("tcp", "localhost:"+s.Port)
 	if err != nil {
 		log.Fatalf("Can't listen: %s", err)
+	} else {
+		log.Println("started to test server in " + s.Port)
 	}
 	go http.Serve(ln, myMux)
 	<-s.stop
