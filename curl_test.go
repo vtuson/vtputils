@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestGet(t *testing.T) {
@@ -15,6 +16,20 @@ func TestGet(t *testing.T) {
 		t.Error(err)
 	}
 	if _, err := HttpStatus(resp); err != nil {
+		t.Error(err)
+	}
+	s.Done()
+}
+
+func TestGetTimeout(t *testing.T) {
+	p := RequestParms{Endpoint: "http://localhost:8000/test", Method: HTTP_GET, Timeout: 1 * time.Second}
+	s := TestServer{Port: "8000"}
+	s.AddRoute("/test", func(res http.ResponseWriter, req *http.Request) {
+		time.Sleep(20 * time.Second)
+	})
+	go s.StartTestServer()
+	_, err := Curl(p)
+	if err == nil {
 		t.Error(err)
 	}
 	s.Done()

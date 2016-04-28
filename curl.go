@@ -12,15 +12,17 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 //Options for Methods on the query
 const (
-	HTTP_PUT      = "PUT"
-	HTTP_POST     = "POST"
-	HTTP_JSONPOST = "JSONPOST"
-	HTTP_DELETE   = "DELETE"
-	HTTP_GET      = "GET"
+	HTTP_PUT        = "PUT"
+	HTTP_POST       = "POST"
+	HTTP_JSONPOST   = "JSONPOST"
+	HTTP_DELETE     = "DELETE"
+	HTTP_GET        = "GET"
+	DEFAULT_TIMEOUT = 10
 )
 
 func formValues(params map[string]string) url.Values {
@@ -50,6 +52,7 @@ type RequestParms struct {
 	Username string            // username for basic authentication
 	Password string            //username for basic autthentication
 	Headers  map[string]string //headers pair with values
+	Timeout  time.Duration     //Timeout duration, if not set uses the default valued of 10sec
 }
 
 //Checks the status code and returns an error if appropiate
@@ -99,6 +102,11 @@ func Curl(p RequestParms) (*http.Response, error) {
 	var req *http.Request
 	var resp *http.Response
 	var err error
+
+	client.Timeout = p.Timeout
+	if client.Timeout == 0 {
+		client.Timeout = time.Second * DEFAULT_TIMEOUT
+	}
 
 	if p.Method == HTTP_GET || p.Method == HTTP_DELETE {
 		url := buildGetUrl(p.Params, p.Endpoint)
